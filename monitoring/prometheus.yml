@@ -1,0 +1,103 @@
+# ===========================================
+# CONFIGURAÇÃO DO PROMETHEUS
+# ===========================================
+#
+# Configuração para coleta de métricas do pipeline de compliance.
+#
+# Métricas coletadas:
+# - Tempo de execução de jobs
+# - Volume de dados processados
+# - Taxa de sucesso/falha
+# - Uso de recursos
+# - Latência de queries
+#
+# Autor: Data Engineering Team
+# Data: 2026-03-29
+#
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['localhost:9093']
+
+# Rule files
+rule_files:
+  - "alert_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # ===========================================
+  # PIPELINE METRICS
+  # ===========================================
+  - job_name: 'pipeline-compliance'
+    static_configs:
+      - targets: ['localhost:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # ===========================================
+  # AIRFLOW METRICS
+  # ===========================================
+  - job_name: 'airflow'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/admin/metrics/'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # ===========================================
+  # SPARK METRICS
+  # ===========================================
+  - job_name: 'spark'
+    static_configs:
+      - targets: ['localhost:4040']
+    metrics_path: '/metrics/json'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # ===========================================
+  # POSTGRES METRICS
+  # ===========================================
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['localhost:9187']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # ===========================================
+  # REDIS METRICS
+  # ===========================================
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['localhost:9121']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # ===========================================
+  # NODE METRICS (SYSTEM)
+  # ===========================================
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # ===========================================
+  # DOCKER METRICS
+  # ===========================================
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['localhost:9323']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s

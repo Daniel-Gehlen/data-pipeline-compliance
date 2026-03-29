@@ -1,0 +1,127 @@
+# ===========================================
+# CONFIGURAÇÃO DO PRE-COMMIT
+# ===========================================
+
+repos:
+  # ===========================================
+  # PYTHON
+  # ===========================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-xml
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # ===========================================
+  # BLACK - FORMATAÇÃO
+  # ===========================================
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
+        language_version: python3.9
+        files: ^ingestion/|^orchestration/|^validation/|^tests/
+
+  # ===========================================
+  # ISORT - ORDENAÇÃO DE IMPORTS
+  # ===========================================
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        files: ^ingestion/|^orchestration/|^validation/|^tests/
+        args: ["--profile", "black"]
+
+  # ===========================================
+  # FLAKE8 - LINTING
+  # ===========================================
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        files: ^ingestion/|^orchestration/|^validation/|^tests/
+        args: ['--max-line-length=120', '--extend-ignore=E203,W503']
+
+  # ===========================================
+  # MYPY - TYPE CHECKING
+  # ===========================================
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.4.1
+    hooks:
+      - id: mypy
+        files: ^ingestion/|^orchestration/|^validation/
+        args: ['--ignore-missing-imports']
+
+  # ===========================================
+  # PYTHON AST CHECK
+  # ===========================================
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: python-check-blanket-noqa
+      - id: python-check-blanket-type-ignore
+      - id: python-no-log-warn
+      - id: python-no-eval
+      - id: python-use-type-annotations
+
+  # ===========================================
+  # YAML
+  # ===========================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-yaml
+        args: ['--unsafe']
+
+  # ===========================================
+  # JSON
+  # ===========================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-json
+
+  # ===========================================
+  # SQL (DBT)
+  # ===========================================
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 2.1.4
+    hooks:
+      - id: sqlfluff-lint
+        files: ^transformation/.*\.sql$
+        args: ['--dialect', 'postgres']
+
+  # ===========================================
+  # SHELL SCRIPTS
+  # ===========================================
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.5
+    hooks:
+      - id: shellcheck
+        files: \.sh$
+
+  # ===========================================
+  # DOCKER
+  # ===========================================
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint
+        files: Dockerfile
+
+  # ===========================================
+  # GIT COMMIT MESSAGES
+  # ===========================================
+  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+    rev: v9.5.0
+    hooks:
+      - id: commitlint
+        stages: [commit-msg]
+        additional_dependencies: ['@commitlint/config-conventional']
