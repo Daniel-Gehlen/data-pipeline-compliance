@@ -1,0 +1,301 @@
+# ===========================================
+# DOCKER COMPOSE - DATA PIPELINE COMPLIANCE
+# ===========================================
+#
+# Este arquivo configura todos os serviços necessários
+# para executar o pipeline de dados de compliance.
+#
+# Serviços:
+# - PostgreSQL: Banco de dados para Airflow e dados fonte
+# - Apache Airflow: Orquestração de pipelines
+# - Apache Spark: Processamento de dados
+# - Great Expectations: Validação de qualidade
+# - Jupyter: Notebook para desenvolvimento (opcional)
+#
+# Uso:
+#   docker-compose up -d          # Iniciar todos os serviços
+#   docker-compose down           # Parar todos os serviços
+#   docker-compose logs -f        # Ver logs em tempo real
+#   docker-compose ps             # Ver status dos containers
+#
+# Autor: Data Engineering Team
+# Data: 2026-03-29
+#
+
+version: '3.8'
+
+services:
+  # ===========================================
+  # POSTGRESQL - Banco de dados
+  # ===========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: compliance-postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - compliance-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===========================================
+  # REDIS - Cache para Airflow
+  # ===========================================
+  redis:
+    image: redis:7-alpine
+    container_name: compliance-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - compliance-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===========================================
+  # APACHE AIRFLOW - Orquestração
+  # ===========================================
+  airflow-webserver:
+    image: apache/airflow:2.7.3-python3.9
+    container_name: compliance-airflow-webserver
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
+      AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+    volumes:
+      - ./orchestration/dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./transformation:/opt/airflow/dbt
+      - ./validation:/opt/airflow/validation
+    ports:
+      - "8080:8080"
+    networks:
+      - compliance-network
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.3-python3.9
+    container_name: compliance-airflow-scheduler
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    volumes:
+      - ./orchestration/dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./transformation:/opt/airflow/dbt
+      - ./validation:/opt/airflow/validation
+    networks:
+      - compliance-network
+    command: scheduler
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  airflow-worker:
+    image: apache/airflow:2.7.3-python3.9
+    container_name: compliance-airflow-worker
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    volumes:
+      - ./orchestration/dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./transformation:/opt/airflow/dbt
+      - ./validation:/opt/airflow/validation
+    networks:
+      - compliance-network
+    command: celery worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  airflow-init:
+    image: apache/airflow:2.7.3-python3.9
+    container_name: compliance-airflow-init
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      _AIRFLOW_DB_UPGRADE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: 'admin'
+      _AIRFLOW_WWW_USER_PASSWORD: 'admin'
+    volumes:
+      - ./orchestration/dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    networks:
+      - compliance-network
+    command: version
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ===========================================
+  # APACHE SPARK - Processamento de dados
+  # ===========================================
+  spark-master:
+    image: bitnami/spark:3.4
+    container_name: compliance-spark-master
+    environment:
+      SPARK_MODE: master
+      SPARK_RPC_AUTHENTICATION_ENABLED: no
+      SPARK_RPC_ENCRYPTION_ENABLED: no
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: no
+      SPARK_SSL_ENABLED: no
+    ports:
+      - "8081:8080"
+      - "7077:7077"
+    volumes:
+      - spark_data:/bitnami/spark
+      - ./ingestion:/opt/spark/jobs/ingestion
+      - ./data:/data
+    networks:
+      - compliance-network
+
+  spark-worker:
+    image: bitnami/spark:3.4
+    container_name: compliance-spark-worker
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 4g
+      SPARK_WORKER_CORES: 2
+      SPARK_RPC_AUTHENTICATION_ENABLED: no
+      SPARK_RPC_ENCRYPTION_ENABLED: no
+      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: no
+      SPARK_SSL_ENABLED: no
+    volumes:
+      - spark_data:/bitnami/spark
+      - ./ingestion:/opt/spark/jobs/ingestion
+      - ./data:/data
+    networks:
+      - compliance-network
+    depends_on:
+      - spark-master
+
+  # ===========================================
+  # GREAT EXPECTATIONS - Validação de qualidade
+  # ===========================================
+  great-expectations:
+    image: python:3.9-slim
+    container_name: compliance-great-expectations
+    working_dir: /app
+    volumes:
+      - ./validation:/app
+      - ./data:/data
+    environment:
+      GE_HOME: /app
+      PYTHONPATH: /app
+    command: >
+      bash -c "
+        pip install great-expectations &&
+        great_expectations init --no-usage-stats &&
+        tail -f /dev/null
+      "
+    networks:
+      - compliance-network
+    depends_on:
+      - postgres
+
+  # ===========================================
+  # JUPYTER - Notebook para desenvolvimento
+  # ===========================================
+  jupyter:
+    image: jupyter/pyspark-notebook:latest
+    container_name: compliance-jupyter
+    ports:
+      - "8888:8888"
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      JUPYTER_TOKEN: "compliance"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./data:/home/jovyan/data
+      - ./ingestion:/home/jovyan/ingestion
+    networks:
+      - compliance-network
+
+  # ===========================================
+  # GRAFANA - Monitoramento (opcional)
+  # ===========================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: compliance-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - compliance-network
+
+# ===========================================
+# VOLUMES
+# ===========================================
+volumes:
+  postgres_data:
+    driver: local
+  spark_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# ===========================================
+# NETWORKS
+# ===========================================
+networks:
+  compliance-network:
+    driver: bridge
