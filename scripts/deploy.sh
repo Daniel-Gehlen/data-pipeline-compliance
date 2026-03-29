@@ -69,7 +69,7 @@ check_dependencies() {
     fi
 
     # Verificar Docker Compose
-    if ! command -v docker-compose &> /dev/null; then
+    if ! command -v docker compose &> /dev/null; then
         log_error "Docker Compose não encontrado. Por favor, instale o Docker Compose."
         exit 1
     fi
@@ -140,7 +140,7 @@ stop_services() {
     cd "$PROJECT_DIR"
 
     if [ -f "docker-compose.yml" ]; then
-        docker-compose down
+        docker compose down
         log_success "Serviços parados."
     else
         log_warning "docker-compose.yml não encontrado."
@@ -173,7 +173,7 @@ start_services() {
     cd "$PROJECT_DIR"
 
     if [ -f "docker-compose.yml" ]; then
-        docker-compose up -d
+        docker compose up -d
         log_success "Serviços iniciados."
     else
         log_error "docker-compose.yml não encontrado."
@@ -247,7 +247,7 @@ run_tests() {
 
 show_status() {
     log_info "Status dos serviços:"
-    docker-compose ps
+    docker compose ps
 
     echo ""
     log_info "URLs de acesso:"
