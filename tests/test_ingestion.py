@@ -63,10 +63,11 @@ class TestIngestComplianceData:
         """Testa validação de schema com dados válidos"""
         # Simular validação de schema
         required_fields = [
-            "id", "transaction_date", "entity_id",
-            "entity_type", "transaction_type", "status",
-            "created_at", "updated_at", "source_system",
-            "batch_id"
+            "id", "transaction_date",
+            "entity_id", "entity_type",
+            "transaction_type", "status",
+            "created_at", "updated_at",
+            "source_system", "batch_id"
         ]
 
         for record in sample_compliance_data:
@@ -103,9 +104,13 @@ class TestIngestComplianceData:
 
         for record in sample_compliance_data:
             enriched = record.copy()
-            enriched["batch_id"] = f"batch_2026-03-29_{123456}"
+            enriched["batch_id"] = (
+                f"batch_2026-03-29_{123456}"
+            )
             enriched["processing_date"] = "2026-03-29"
-            enriched["ingestion_timestamp"] = "2026-03-29T12:00:00"
+            enriched["ingestion_timestamp"] = (
+                "2026-03-29T12:00:00"
+            )
             enriched_data.append(enriched)
 
         for record in enriched_data:

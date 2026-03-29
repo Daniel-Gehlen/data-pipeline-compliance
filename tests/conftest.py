@@ -9,6 +9,7 @@ Autor: Data Engineering Team
 Data: 2026-03-29
 """
 
+import os
 import pytest
 import sys
 from pathlib import Path
@@ -137,4 +138,6 @@ def assert_dataframe_equal(df1, df2, check_order=False):
         df1_data = sorted(df1_data, key=lambda x: str(x))
         df2_data = sorted(df2_data, key=lambda x: str(x))
 
-    assert df1_data == df2_data, "Dados dos DataFrames são diferentes"
+    assert df1_data == df2_data, (
+        "Dados dos DataFrames são diferentes"
+    )
