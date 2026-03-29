@@ -14,14 +14,16 @@ Data: 2026-03-29
 """
 
 from datetime import datetime, timedelta
+import logging
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
-from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+from airflow.providers.apache.spark.operators.spark_submit import (
+    SparkSubmitOperator
+)
 from airflow.operators.dummy import DummyOperator
 from airflow.utils.task_group import TaskGroup
-from airflow.models import Variable
-import logging
 
 # ===========================================
 # CONFIGURAÇÕES PADRÃO
@@ -47,8 +49,11 @@ default_args = {
 dag = DAG(
     'pipeline_compliance',
     default_args=default_args,
-    description='Pipeline principal de ingestão, transformação e validação de dados de compliance',
-    schedule_interval='0 2 * * *',  # Executa diariamente às 02:00
+    description=(
+        'Pipeline principal de ingestão, transformação '
+        'e validação de dados de compliance'
+    ),
+    schedule_interval='0 2 * * *',
     max_active_runs=1,
     tags=['compliance', 'production', 'critical'],
     doc_md="""
@@ -72,7 +77,10 @@ dag = DAG(
 
 def log_execution_start(**context):
     """Registra início da execução do pipeline"""
-    logging.info(f"Iniciando pipeline de compliance - Execução: {context['execution_date']}")
+    logging.info(
+        f"Iniciando pipeline de compliance - "
+        f"Execução: {context['execution_date']}"
+    )
     logging.info(f"DAG Run ID: {context['dag_run'].run_id}")
 
     # Registrar metadados em tabela de auditoria
@@ -88,7 +96,10 @@ def log_execution_start(**context):
 
 def log_execution_end(**context):
     """Registra fim da execução do pipeline"""
-    logging.info(f"Finalizando pipeline de compliance - Execução: {context['execution_date']}")
+    logging.info(
+        f"Finalizando pipeline de compliance - "
+        f"Execução: {context['execution_date']}"
+    )
 
     execution_metadata = {
         'dag_id': context['dag'].dag_id,
@@ -104,7 +115,7 @@ def validate_ingestion_output(**context):
     """Valida se a ingestão foi bem-sucedida"""
     logging.info("Validando saída da ingestão...")
     # Lógica de validação seria implementada aqui
-    # Por exemplo: verificar se arquivos foram criados, contagem de registros, etc.
+    # Por exemplo: verificar se arquivos foram criados
     return True
 
 
@@ -135,7 +146,10 @@ with TaskGroup("ingestion", dag=dag) as ingestion_group:
 
     ingest_raw_data = SparkSubmitOperator(
         task_id='ingest_raw_data',
-        application='/opt/spark/jobs/ingestion/ingest_compliance_data.py',
+        application=(
+            '/opt/spark/jobs/ingestion/'
+            'ingest_compliance_data.py'
+        ),
         conn_id='spark_default',
         conf={
             'spark.executor.memory': '4g',
@@ -165,25 +179,38 @@ with TaskGroup("transformation", dag=dag) as transformation_group:
 
     dbt_run_staging = BashOperator(
         task_id='dbt_run_staging',
-        bash_command='cd /opt/airflow/dbt && dbt run --select staging --vars \'{"processing_date": "{{ ds }}"}\'',
+        bash_command=(
+            'cd /opt/airflow/dbt && dbt run '
+            '--select staging '
+            '--vars \'{"processing_date": "{{ ds }}"}\''
+        ),
         dag=dag,
     )
 
     dbt_test_staging = BashOperator(
         task_id='dbt_test_staging',
-        bash_command='cd /opt/airflow/dbt && dbt test --select staging',
+        bash_command=(
+            'cd /opt/airflow/dbt && dbt test --select staging'
+        ),
         dag=dag,
     )
 
     dbt_run_intermediate = BashOperator(
         task_id='dbt_run_intermediate',
-        bash_command='cd /opt/airflow/dbt && dbt run --select intermediate --vars \'{"processing_date": "{{ ds }}"}\'',
+        bash_command=(
+            'cd /opt/airflow/dbt && dbt run '
+            '--select intermediate '
+            '--vars \'{"processing_date": "{{ ds }}"}\''
+        ),
         dag=dag,
     )
 
     dbt_test_intermediate = BashOperator(
         task_id='dbt_test_intermediate',
-        bash_command='cd /opt/airflow/dbt && dbt test --select intermediate',
+        bash_command=(
+            'cd /opt/airflow/dbt && '
+            'dbt test --select intermediate'
+        ),
         dag=dag,
     )
 
@@ -194,7 +221,11 @@ with TaskGroup("validation", dag=dag) as validation_group:
 
     run_great_expectations = BashOperator(
         task_id='run_great_expectations',
-        bash_command='cd /opt/airflow/validation && great_expectations checkpoint run compliance_checkpoint',
+        bash_command=(
+            'cd /opt/airflow/validation && '
+            'great_expectations checkpoint run '
+            'compliance_checkpoint'
+        ),
         dag=dag,
     )
 
@@ -212,13 +243,19 @@ with TaskGroup("final_load", dag=dag) as final_load_group:
 
     dbt_run_mart = BashOperator(
         task_id='dbt_run_mart',
-        bash_command='cd /opt/airflow/dbt && dbt run --select mart --vars \'{"processing_date": "{{ ds }}"}\'',
+        bash_command=(
+            'cd /opt/airflow/dbt && dbt run '
+            '--select mart '
+            '--vars \'{"processing_date": "{{ ds }}"}\''
+        ),
         dag=dag,
     )
 
     dbt_test_mart = BashOperator(
         task_id='dbt_test_mart',
-        bash_command='cd /opt/airflow/dbt && dbt test --select mart',
+        bash_command=(
+            'cd /opt/airflow/dbt && dbt test --select mart'
+        ),
         dag=dag,
     )
 
@@ -241,4 +278,8 @@ end = DummyOperator(
 # ORDEM DE EXECUÇÃO
 # ===========================================
 
-start >> log_start >> ingestion_group >> transformation_group >> validation_group >> final_load_group >> log_end >> end
+start >> log_start >> ingestion_group
+ingestion_group >> transformation_group
+transformation_group >> validation_group
+validation_group >> final_load_group
+final_load_group >> log_end >> end

@@ -10,13 +10,12 @@ Data: 2026-03-29
 """
 
 import pytest
-import os
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+
 
 # ===========================================
 # TESTES UNITÁRIOS
 # ===========================================
+
 
 class TestIngestComplianceData:
     """Testes para IngestComplianceData"""
@@ -58,13 +57,16 @@ class TestIngestComplianceData:
         assert arg_map.get("source", "jdbc") == "jdbc"
         assert arg_map.get("output", "/data/raw/compliance") == "/data/raw/compliance"
 
-    def test_validate_schema_with_valid_data(self, sample_compliance_data):
+    def test_validate_schema_with_valid_data(
+        self, sample_compliance_data
+    ):
         """Testa validação de schema com dados válidos"""
         # Simular validação de schema
         required_fields = [
-            "id", "transaction_date", "entity_id", "entity_type",
-            "transaction_type", "status", "created_at", "updated_at",
-            "source_system", "batch_id"
+            "id", "transaction_date", "entity_id",
+            "entity_type", "transaction_type", "status",
+            "created_at", "updated_at", "source_system",
+            "batch_id"
         ]
 
         for record in sample_compliance_data:
@@ -80,7 +82,10 @@ class TestIngestComplianceData:
             "entity_type": "COMPANY"
         }
 
-        required_fields = ["id", "transaction_date", "entity_id", "entity_type"]
+        required_fields = [
+            "id", "transaction_date",
+            "entity_id", "entity_type"
+        ]
 
         missing_fields = [
             field for field in required_fields
@@ -90,7 +95,9 @@ class TestIngestComplianceData:
         assert len(missing_fields) > 0, "Deveria detectar campos faltando"
         assert "entity_id" in missing_fields
 
-    def test_enrich_data_adds_metadata(self, sample_compliance_data):
+    def test_enrich_data_adds_metadata(
+        self, sample_compliance_data
+    ):
         """Testa se enriquecimento adiciona metadados"""
         enriched_data = []
 
@@ -131,20 +138,24 @@ class TestIngestComplianceData:
                 return True
             return False
 
-        assert check_requires_review(75, []) == True
-        assert check_requires_review(50, ["SUSPICIOUS"]) == True
-        assert check_requires_review(30, []) == False
-        assert check_requires_review(69, ["OTHER"]) == False
+        assert check_requires_review(75, []) is True
+        assert check_requires_review(50, ["SUSPICIOUS"]) is True
+        assert check_requires_review(30, []) is False
+        assert check_requires_review(69, ["OTHER"]) is False
+
 
 # ===========================================
 # TESTES DE INTEGRAÇÃO
 # ===========================================
 
+
 class TestIngestionIntegration:
     """Testes de integração para ingestão"""
 
     @pytest.mark.integration
-    def test_full_ingestion_flow(self, sample_compliance_data, tmp_path):
+    def test_full_ingestion_flow(
+        self, sample_compliance_data, tmp_path
+    ):
         """Testa fluxo completo de ingestão"""
         # Simular fluxo completo
         output_dir = tmp_path / "output"
@@ -168,7 +179,9 @@ class TestIngestionIntegration:
         assert loaded_data[0]["id"] == sample_compliance_data[0]["id"]
 
     @pytest.mark.integration
-    def test_delta_lake_write_simulation(self, sample_compliance_data):
+    def test_delta_lake_write_simulation(
+        self, sample_compliance_data
+    ):
         """Simula escrita no Delta Lake"""
         # Simular operação de escrita
         write_config = {
@@ -200,9 +213,11 @@ class TestIngestionIntegration:
         assert merge_config["when_matched"] == "updateAll"
         assert merge_config["when_not_matched"] == "insertAll"
 
+
 # ===========================================
 # TESTES DE PERFORMANCE
 # ===========================================
+
 
 class TestIngestionPerformance:
     """Testes de performance para ingestão"""
@@ -249,8 +264,12 @@ class TestIngestionPerformance:
             processing_time = batch_size * 0.001  # 1ms por registro
 
             # Verificar se está dentro do SLA (< 10 segundos por batch)
-            assert processing_time < 10.0, f"Batch de {batch_size} registros excedeu SLA"
+            assert processing_time < 10.0, (
+                f"Batch de {batch_size} registros excedeu SLA"
+            )
 
             # Verificar throughput (> 100 registros/segundo)
             throughput = records_processed / processing_time
-            assert throughput > 100, f"Throughput insuficiente: {throughput} registros/segundo"
+            assert throughput > 100, (
+                f"Throughput insuficiente: {throughput} registros/segundo"
+            )

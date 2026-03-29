@@ -10,7 +10,6 @@ Data: 2026-03-29
 """
 
 import pytest
-import os
 import sys
 from pathlib import Path
 
@@ -18,19 +17,23 @@ from pathlib import Path
 root_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(root_dir))
 
+
 # ===========================================
 # FIXTURES GLOBAIS
 # ===========================================
+
 
 @pytest.fixture(scope="session")
 def project_root():
     """Retorna o diretório raiz do projeto"""
     return root_dir
 
+
 @pytest.fixture(scope="session")
 def test_data_dir(project_root):
     """Retorna o diretório de dados de teste"""
     return project_root / "tests" / "data"
+
 
 @pytest.fixture(scope="session")
 def sample_compliance_data():
@@ -86,9 +89,11 @@ def cleanup_test_files():
             import shutil
             shutil.rmtree(test_dir)
 
+
 # ===========================================
 # CONFIGURAÇÕES DE AMBIENTE
 # ===========================================
+
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_environment():
@@ -109,10 +114,11 @@ def setup_test_environment():
 # HELPERS
 # ===========================================
 
+
 def create_test_dataframe(spark, data):
     """Cria DataFrame de teste a partir de dicionário"""
-    from pyspark.sql import SparkSession
     return spark.createDataFrame(data)
+
 
 def assert_dataframe_equal(df1, df2, check_order=False):
     """Compara dois DataFrames"""
