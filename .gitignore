@@ -1,0 +1,124 @@
+# ===========================================
+# ARQUIVOS E DIRETÓRIOS A SEREM IGNORADOS
+# ===========================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Scala/SBT
+target/
+project/target/
+project/project/
+*.class
+*.log
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# DBT
+transformation/target/
+transformation/dbt_packages/
+transformation/logs/
+transformation/.user.yml
+
+# Airflow
+orchestration/airflow.db
+orchestration/airflow.cfg
+orchestration/standalone_admin_password.txt
+orchestration/logs/
+orchestration/plugins/
+orchestration/airflow-webserver.pid
+
+# Great Expectations
+validation/uncommitted/
+validation/.config/
+
+# Delta Lake / Spark
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Secrets
+*.pem
+*.key
+*.cert
+credentials/
+secrets/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Data files (manter no storage, não no Git)
+*.csv
+*.parquet
+*.json
+*.avro
+data/
+
+# Docker
+docker-compose.override.yml
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Pytest
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/

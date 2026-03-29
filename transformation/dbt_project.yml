@@ -1,0 +1,99 @@
+# ===========================================
+# CONFIGURAÇÃO DO PROJETO DBT
+# ===========================================
+
+name: 'data_pipeline_compliance'
+version: '1.0.0'
+config-version: 2
+
+# Perfil de conexão ao banco de dados
+profile: 'data_pipeline_compliance'
+
+# Configurações do modelo
+model-paths: ["models"]
+analysis-paths: ["analysis"]
+test-paths: ["tests"]
+seed-paths: ["data"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Variáveis do projeto
+vars:
+  # Data de referência para processamento
+  processing_date: "{{ run_started_at.strftime('%Y-%m-%d') }}"
+
+  # Ambiente (dev, staging, prod)
+  environment: "dev"
+
+  # Schema para camada staging
+  staging_schema: "staging"
+
+  # Schema para camada intermediate
+  intermediate_schema: "intermediate"
+
+  # Schema para camada mart
+  mart_schema: "mart"
+
+# Configurações de materialização padrão
+models:
+  data_pipeline_compliance:
+    # Configurações para camada staging
+    staging:
+      +materialized: view
+      +schema: "{{ var('staging_schema') }}"
+      +tags: ["staging"]
+
+    # Configurações para camada intermediate
+    intermediate:
+      +materialized: table
+      +schema: "{{ var('intermediate_schema') }}"
+      +tags: ["intermediate"]
+
+    # Configurações para camada mart
+    mart:
+      +materialized: table
+      +schema: "{{ var('mart_schema') }}"
+      +tags: ["mart"]
+      +grants:
+        select: ["analytics_users", "compliance_team"]
+
+# Configurações de testes
+tests:
+  data_pipeline_compliance:
+    +severity: error
+    +store_failures: true
+    +schema: "test_results"
+
+# Configurações de snapshots
+snapshots:
+  data_pipeline_compliance:
+    +target_schema: "snapshots"
+    +strategy: check
+    +check_cols: ["all"]
+
+# Configurações de sementes (seeds)
+seeds:
+  data_pipeline_compliance:
+    +schema: "reference_data"
+    +column_types:
+      created_at: timestamp
+      updated_at: timestamp
+
+# Configurações de macros
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['data_pipeline_compliance', 'dbt_utils']
+
+# Documentação do projeto
+description: >
+  Projeto DBT para transformação de dados do pipeline de compliance.
+  Implementa camadas staging, intermediate e mart com foco em:
+  - Rastreabilidade de dados
+  - Qualidade e validação
+  - Governança e compliance
+  - Performance e otimização
