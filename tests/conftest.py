@@ -127,8 +127,8 @@ def assert_dataframe_equal(df1, df2, check_order=False):
         df1 = df1.sort(df1.columns)
         df2 = df2.sort(df2.columns)
 
-    assert df1.count() == df2.count(), "DataFrames têm número diferente de linhas"
-    assert set(df1.columns) == set(df2.columns), "DataFrames têm colunas diferentes"
+    assert df1.count() == df2.count(), "DataFrames tem numero diferente de linhas"
+    assert set(df1.columns) == set(df2.columns), "DataFrames tem colunas diferentes"
 
     # Comparar dados
     df1_data = [row.asDict() for row in df1.collect()]
