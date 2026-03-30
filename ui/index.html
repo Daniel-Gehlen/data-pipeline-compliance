@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pipeline Compliance - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>Compliance Hub</span>
+            </div>
+            <button class="toggle-btn" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item active" data-page="dashboard">
+                <a href="#dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item" data-page="pipeline">
+                <a href="#pipeline">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Pipeline</span>
+                </a>
+            </li>
+            <li class="nav-item" data-page="airflow">
+                <a href="#airflow">
+                    <i class="fas fa-wind"></i>
+                    <span>Airflow</span>
+                </a>
+            </li>
+            <li class="nav-item" data-page="spark">
+                <a href="#spark">
+                    <i class="fas fa-bolt"></i>
+                    <span>Spark</span>
+                </a>
+            </li>
+            <li class="nav-item" data-page="grafana">
+                <a href="#grafana">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Grafana</span>
+                </a>
+            </li>
+            <li class="nav-item" data-page="jupyter">
+                <a href="#jupyter">
+                    <i class="fas fa-book"></i>
+                    <span>Jupyter</span>
+                </a>
+            </li>
+            <li class="nav-item" data-page="database">
+                <a href="#database">
+                    <i class="fas fa-database"></i>
+                    <span>PostgreSQL</span>
+                </a>
+            </li>
+            <li class="nav-item" data-page="validation">
+                <a href="#validation">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Validação</span>
+                </a>
+            </li>
+            <li class="nav-item" data-page="settings">
+                <a href="#settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Configurações</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <span class="user-name">Admin</span>
+                    <span class="user-role">Data Engineer</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-left">
+                <h1 id="pageTitle">Dashboard</h1>
+                <p class="header-subtitle">Data Pipeline Compliance - Visão Geral</p>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar...">
+                </div>
+                <button class="refresh-btn" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Page -->
+        <section class="page active" id="dashboard-page">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="successRate">98.5%</h3>
+                        <p>Taxa de Sucesso</p>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i> 2.3%
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalTransactions">1,234,567</h3>
+                        <p>Transações Processadas</p>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i> 15.7%
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="highRiskCount">47</h3>
+                        <p>Alertas de Alto Risco</p>
+                    </div>
+                    <div class="stat-trend down">
+                        <i class="fas fa-arrow-down"></i> 8.1%
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="avgProcessingTime">2.4h</h3>
+                        <p>Tempo Médio de Processamento</p>
+                    </div>
+                    <div class="stat-trend down">
+                        <i class="fas fa-arrow-down"></i> 12.5%
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Transações por Nível de Risco</h3>
+                        <select class="chart-filter">
+                            <option>Últimos 7 dias</option>
+                            <option>Últimos 30 dias</option>
+                            <option>Último ano</option>
+                        </select>
+                    </div>
+                    <canvas id="riskChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Volume de Transações Diárias</h3>
+                        <select class="chart-filter">
+                            <option>Últimos 7 dias</option>
+                            <option>Últimos 30 dias</option>
+                        </select>
+                    </div>
+                    <canvas id="volumeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Services Status -->
+            <div class="services-section">
+                <h2>Status dos Serviços</h2>
+                <div class="services-grid">
+                    <div class="service-card online" id="service-airflow">
+                        <div class="service-icon">
+                            <i class="fas fa-wind"></i>
+                        </div>
+                        <div class="service-info">
+                            <h4>Apache Airflow</h4>
+                            <p>Orquestração</p>
+                        </div>
+                        <div class="service-status">
+                            <span class="status-dot online"></span>
+                            <span>Online</span>
+                        </div>
+                        <a href="http://localhost:8080" target="_blank" class="service-link">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                    <div class="service-card online" id="service-spark">
+                        <div class="service-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="service-info">
+                            <h4>Apache Spark</h4>
+                            <p>Processamento</p>
+                        </div>
+                        <div class="service-status">
+                            <span class="status-dot online"></span>
+                            <span>Online</span>
+                        </div>
+                        <a href="http://localhost:8081" target="_blank" class="service-link">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                    <div class="service-card online" id="service-grafana">
+                        <div class="service-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="service-info">
+                            <h4>Grafana</h4>
+                            <p>Monitoramento</p>
+                        </div>
+                        <div class="service-status">
+                            <span class="status-dot online"></span>
+                            <span>Online</span>
+                        </div>
+                        <a href="http://localhost:3000" target="_blank" class="service-link">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                    <div class="service-card online" id="service-jupyter">
+                        <div class="service-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="service-info">
+                            <h4>Jupyter</h4>
+                            <p>Notebooks</p>
+                        </div>
+                        <div class="service-status">
+                            <span class="status-dot online"></span>
+                            <span>Online</span>
+                        </div>
+                        <a href="http://localhost:8888" target="_blank" class="service-link">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                    <div class="service-card online" id="service-postgres">
+                        <div class="service-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="service-info">
+                            <h4>PostgreSQL</h4>
+                            <p>Banco de Dados</p>
+                        </div>
+                        <div class="service-status">
+                            <span class="status-dot online"></span>
+                            <span>Online</span>
+                        </div>
+                        <button class="service-connect" onclick="showDatabaseModal()">
+                            <i class="fas fa-plug"></i>
+                        </button>
+                    </div>
+                    <div class="service-card online" id="service-redis">
+                        <div class="service-icon">
+                            <i class="fas fa-memory"></i>
+                        </div>
+                        <div class="service-info">
+                            <h4>Redis</h4>
+                            <p>Cache</p>
+                        </div>
+                        <div class="service-status">
+                            <span class="status-dot online"></span>
+                            <span>Online</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-section">
+                <h2>Atividade Recente</h2>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="activity-info">
+                            <h4>Pipeline executado com sucesso</h4>
+                            <p>pipeline_compliance - Execução #1234</p>
+                        </div>
+                        <span class="activity-time">Há 2 horas</span>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon warning">
+                            <i class="fas fa-exclamation"></i>
+                        </div>
+                        <div class="activity-info">
+                            <h4>Alerta de alto risco detectado</h4>
+                            <p>Entidade ENT_001 - Score de risco: 85</p>
+                        </div>
+                        <span class="activity-time">Há 4 horas</span>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon info">
+                            <i class="fas fa-info"></i>
+                        </div>
+                        <div class="activity-info">
+                            <h4>Validação de qualidade concluída</h4>
+                            <p>Great Expectations - 15/15 testes passaram</p>
+                        </div>
+                        <span class="activity-time">Há 6 horas</span>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="activity-info">
+                            <h4>Transformação DBT executada</h4>
+                            <p>Models staging, intermediate e mart atualizados</p>
+                        </div>
+                        <span class="activity-time">Há 8 horas</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pipeline Page -->
+        <section class="page" id="pipeline-page">
+            <div class="page-header">
+                <h2>Visualização do Pipeline</h2>
+                <p>Fluxo completo de ingestão, transformação e validação de dados</p>
+            </div>
+
+            <div class="pipeline-visualization">
+                <div class="pipeline-stage" data-stage="ingestion">
+                    <div class="stage-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <div class="stage-info">
+                        <h3>Ingestão</h3>
+                        <p>Apache Spark</p>
+                    </div>
+                    <div class="stage-status completed">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+
+                <div class="pipeline-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+
+                <div class="pipeline-stage" data-stage="staging">
+                    <div class="stage-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="stage-info">
+                        <h3>Staging</h3>
+                        <p>DBT Models</p>
+                    </div>
+                    <div class="stage-status completed">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+
+                <div class="pipeline-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+
+                <div class="pipeline-stage" data-stage="intermediate">
+                    <div class="stage-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="stage-info">
+                        <h3>Intermediate</h3>
+                        <p>Análise de Risco</p>
+                    </div>
+                    <div class="stage-status completed">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+
+                <div class="pipeline-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+
+                <div class="pipeline-stage" data-stage="validation">
+                    <div class="stage-icon">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                    <div class="stage-info">
+                        <h3>Validação</h3>
+                        <p>Great Expectations</p>
+                    </div>
+                    <div class="stage-status completed">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+
+                <div class="pipeline-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+
+                <div class="pipeline-stage" data-stage="mart">
+                    <div class="stage-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stage-info">
+                        <h3>Mart</h3>
+                        <p>Tabela Final</p>
+                    </div>
+                    <div class="stage-status completed">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pipeline-details">
+                <div class="detail-card">
+                    <h4><i class="fas fa-clock"></i> Última Execução</h4>
+                    <p class="detail-value">29/03/2026 02:00</p>
+                </div>
+                <div class="detail-card">
+                    <h4><i class="fas fa-hourglass-half"></i> Duração</h4>
+                    <p class="detail-value">2h 34m</p>
+                </div>
+                <div class="detail-card">
+                    <h4><i class="fas fa-database"></i> Registros Processados</h4>
+                    <p class="detail-value">1,234,567</p>
+                </div>
+                <div class="detail-card">
+                    <h4><i class="fas fa-shield-alt"></i> Status de Compliance</h4>
+                    <p class="detail-value success">Aprovado</p>
+                </div>
+            </div>
+
+            <div class="dag-visualization">
+                <h3>Visualização da DAG</h3>
+                <div class="dag-container" id="dagContainer">
+                    <!-- DAG will be rendered here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Airflow Page -->
+        <section class="page" id="airflow-page">
+            <div class="page-header">
+                <h2>Apache Airflow</h2>
+                <p>Orquestração de pipelines e agendamento de tarefas</p>
+            </div>
+
+            <div class="airflow-dashboard">
+                <div class="airflow-stats">
+                    <div class="airflow-stat">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">DAGs Ativas</div>
+                    </div>
+                    <div class="airflow-stat">
+                        <div class="stat-value">156</div>
+                        <div class="stat-label">Execuções (30 dias)</div>
+                    </div>
+                    <div class="airflow-stat">
+                        <div class="stat-value">98.7%</div>
+                        <div class="stat-label">Taxa de Sucesso</div>
+                    </div>
+                    <div class="airflow-stat">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Em Execução</div>
+                    </div>
+                </div>
+
+                <div class="airflow-dags">
+                    <h3>DAGs Recentes</h3>
+                    <div class="dag-list">
+                        <div class="dag-item">
+                            <div class="dag-info">
+                                <h4>pipeline_compliance</h4>
+                                <p>Pipeline principal de compliance</p>
+                            </div>
+                            <div class="dag-status success">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Sucesso</span>
+                            </div>
+                            <div class="dag-schedule">
+                                <i class="fas fa-clock"></i>
+                                <span>0 2 * * *</span>
+                            </div>
+                            <a href="http://localhost:8080/dags/pipeline_compliance" target="_blank" class="dag-link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                        <div class="dag-item">
+                            <div class="dag-info">
+                                <h4>data_quality_check</h4>
+                                <p>Verificação de qualidade</p>
+                            </div>
+                            <div class="dag-status success">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Sucesso</span>
+                            </div>
+                            <div class="dag-schedule">
+                                <i class="fas fa-clock"></i>
+                                <span>0 */6 * * *</span>
+                            </div>
+                            <a href="http://localhost:8080" target="_blank" class="dag-link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                        <div class="dag-item">
+                            <div class="dag-info">
+                                <h4>alert_monitoring</h4>
+                                <p>Monitoramento de alertas</p>
+                            </div>
+                            <div class="dag-status running">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>Executando</span>
+                            </div>
+                            <div class="dag-schedule">
+                                <i class="fas fa-clock"></i>
+                                <span>*/15 * * * *</span>
+                            </div>
+                            <a href="http://localhost:8080" target="_blank" class="dag-link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="airflow-actions">
+                    <button class="btn btn-primary" onclick="window.open('http://localhost:8080', '_blank')">
+                        <i class="fas fa-external-link-alt"></i>
+                        Abrir Airflow UI
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshAirflowData()">
+                        <i class="fas fa-sync-alt"></i>
+                        Atualizar Dados
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Spark Page -->
+        <section class="page" id="spark-page">
+            <div class="page-header">
+                <h2>Apache Spark</h2>
+                <p>Processamento distribuído de dados</p>
+            </div>
+
+            <div class="spark-dashboard">
+                <div class="spark-cluster">
+                    <h3>Status do Cluster</h3>
+                    <div class="cluster-info">
+                        <div class="cluster-node master">
+                            <div class="node-icon">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <div class="node-info">
+                                <h4>Master Node</h4>
+                                <p>spark-master:7077</p>
+                                <span class="status online">Online</span>
+                            </div>
+                        </div>
+                        <div class="cluster-node worker">
+                            <div class="node-icon">
+                                <i class="fas fa-desktop"></i>
+                            </div>
+                            <div class="node-info">
+                                <h4>Worker Node</h4>
+                                <p>4GB RAM, 2 Cores</p>
+                                <span class="status online">Online</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="spark-jobs">
+                    <h3>Jobs Recentes</h3>
+                    <div class="job-list">
+                        <div class="job-item">
+                            <div class="job-info">
+                                <h4>ingest_compliance_data</h4>
+                                <p>Ingestão de dados brutos</p>
+                            </div>
+                            <div class="job-status success">
+                                <span>Completo</span>
+                            </div>
+                            <div class="job-duration">12m 34s</div>
+                        </div>
+                        <div class="job-item">
+                            <div class="job-info">
+                                <h4>transform_compliance</h4>
+                                <p>Transformação de dados</p>
+                            </div>
+                            <div class="job-status success">
+                                <span>Completo</span>
+                            </div>
+                            <div class="job-duration">8m 21s</div>
+                        </div>
+                        <div class="job-item">
+                            <div class="job-info">
+                                <h4>risk_analysis</h4>
+                                <p>Análise de risco</p>
+                            </div>
+                            <div class="job-status running">
+                                <span>Em execução</span>
+                            </div>
+                            <div class="job-duration">5m 12s</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="spark-actions">
+                    <button class="btn btn-primary" onclick="window.open('http://localhost:8081', '_blank')">
+                        <i class="fas fa-external-link-alt"></i>
+                        Abrir Spark Master UI
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Grafana Page -->
+        <section class="page" id="grafana-page">
+            <div class="page-header">
+                <h2>Grafana</h2>
+                <p>Monitoramento e dashboards de métricas</p>
+            </div>
+
+            <div class="grafana-dashboard">
+                <div class="grafana-embed">
+                    <div class="embed-header">
+                        <h3>Dashboards Disponíveis</h3>
+                        <a href="http://localhost:3000" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt"></i>
+                            Abrir Grafana
+                        </a>
+                    </div>
+                    <div class="dashboard-list">
+                        <div class="dashboard-item">
+                            <div class="dashboard-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="dashboard-info">
+                                <h4>Pipeline Overview</h4>
+                                <p>Visão geral do pipeline de compliance</p>
+                            </div>
+                            <a href="http://localhost:3000/d/pipeline-overview" target="_blank" class="dashboard-link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                        <div class="dashboard-item">
+                            <div class="dashboard-icon">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <div class="dashboard-info">
+                                <h4>Risk Analysis</h4>
+                                <p>Análise de risco de compliance</p>
+                            </div>
+                            <a href="http://localhost:3000/d/risk-analysis" target="_blank" class="dashboard-link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                        <div class="dashboard-item">
+                            <div class="dashboard-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="dashboard-info">
+                                <h4>Service Health</h4>
+                                <p>Saúde dos serviços do pipeline</p>
+                            </div>
+                            <a href="http://localhost:3000/d/service-health" target="_blank" class="dashboard-link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Jupyter Page -->
+        <section class="page" id="jupyter-page">
+            <div class="page-header">
+                <h2>Jupyter Notebooks</h2>
+                <p>Desolvimento e análise interativa de dados</p>
+            </div>
+
+            <div class="jupyter-dashboard">
+                <div class="jupyter-info">
+                    <div class="info-card">
+                        <i class="fas fa-book"></i>
+                        <h4>Notebooks Disponíveis</h4>
+                        <p>8 notebooks</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-folder"></i>
+                        <h4>Diretório de Trabalho</h4>
+                        <p>/home/jovyan/work</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-database"></i>
+                        <h4>Dados Acessíveis</h4>
+                        <p>/home/jovyan/data</p>
+                    </div>
+                </div>
+
+                <div class="notebook-list">
+                    <h3>Notebooks Recentes</h3>
+                    <div class="notebook-item">
+                        <div class="notebook-icon">
+                            <i class="fas fa-file-code"></i>
+                        </div>
+                        <div class="notebook-info">
+                            <h4>data_exploration.ipynb</h4>
+                            <p>Exploração inicial dos dados de compliance</p>
+                        </div>
+                        <span class="notebook-date">29/03/2026</span>
+                    </div>
+                    <div class="notebook-item">
+                        <div class="notebook-icon">
+                            <i class="fas fa-file-code"></i>
+                        </div>
+                        <div class="notebook-info">
+                            <h4>risk_analysis.ipynb</h4>
+                            <p>Análise de risco de compliance</p>
+                        </div>
+                        <span class="notebook-date">28/03/2026</span>
+                    </div>
+                    <div class="notebook-item">
+                        <div class="notebook-icon">
+                            <i class="fas fa-file-code"></i>
+                        </div>
+                        <div class="notebook-info">
+                            <h4>data_quality.ipynb</h4>
+                            <p>Verificação de qualidade dos dados</p>
+                        </div>
+                        <span class="notebook-date">27/03/2026</span>
+                    </div>
+                </div>
+
+                <div class="jupyter-actions">
+                    <button class="btn btn-primary" onclick="window.open('http://localhost:8888', '_blank')">
+                        <i class="fas fa-external-link-alt"></i>
+                        Abrir Jupyter Lab
+                    </button>
+                    <button class="btn btn-secondary" onclick="createNewNotebook()">
+                        <i class="fas fa-plus"></i>
+                        Novo Notebook
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Database Page -->
+        <section class="page" id="database-page">
+            <div class="page-header">
+                <h2>PostgreSQL</h2>
+                <p>Banco de dados para Airflow e dados de compliance</p>
+            </div>
+
+            <div class="database-dashboard">
+                <div class="db-connection">
+                    <h3>Conexão</h3>
+                    <div class="connection-info">
+                        <div class="info-row">
+                            <span class="label">Host:</span>
+                            <span class="value">localhost:5432</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Database:</span>
+                            <span class="value">airflow</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Usuário:</span>
+                            <span class="value">airflow</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showDatabaseModal()">
+                        <i class="fas fa-plug"></i>
+                        Conectar
+                    </button>
+                </div>
+
+                <div class="db-tables">
+                    <h3>Tabelas Principais</h3>
+                    <div class="table-list">
+                        <div class="table-item">
+                            <div class="table-icon">
+                                <i class="fas fa-table"></i>
+                            </div>
+                            <div class="table-info">
+                                <h4>compliance_transactions</h4>
+                                <p>Tabela principal de transações</p>
+                            </div>
+                            <span class="table-rows">1,234,567 linhas</span>
+                        </div>
+                        <div class="table-item">
+                            <div class="table-icon">
+                                <i class="fas fa-table"></i>
+                            </div>
+                            <div class="table-info">
+                                <h4>entity_risk_analysis</h4>
+                                <p>Análise de risco por entidade</p>
+                            </div>
+                            <span class="table-rows">45,678 linhas</span>
+                        </div>
+                        <div class="table-item">
+                            <div class="table-icon">
+                                <i class="fas fa-table"></i>
+                            </div>
+                            <div class="table-info">
+                                <h4>audit_logs</h4>
+                                <p>Logs de auditoria</p>
+                            </div>
+                            <span class="table-rows">890,123 linhas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="db-query">
+                    <h3>Executar Query</h3>
+                    <div class="query-editor">
+                        <textarea id="queryInput" placeholder="Digite sua query SQL aqui...">SELECT * FROM compliance_transactions LIMIT 10;</textarea>
+                        <button class="btn btn-primary" onclick="executeQuery()">
+                            <i class="fas fa-play"></i>
+                            Executar
+                        </button>
+                    </div>
+                    <div class="query-result" id="queryResult">
+                        <!-- Results will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Validation Page -->
+        <section class="page" id="validation-page">
+            <div class="page-header">
+                <h2>Validação de Qualidade</h2>
+                <p>Great Expectations - Testes de qualidade de dados</p>
+            </div>
+
+            <div class="validation-dashboard">
+                <div class="validation-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>15/15</h3>
+                            <p>Testes Passaram</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-vial"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>24</h3>
+                            <p>Expectativas Configuradas</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>100%</h3>
+                            <p>Taxa de Conformidade</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="validation-results">
+                    <h3>Resultados dos Testes</h3>
+                    <div class="test-list">
+                        <div class="test-item success">
+                            <div class="test-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="test-info">
+                                <h4>expect_column_to_not_be_null</h4>
+                                <p>transaction_id não deve ser nulo</p>
+                            </div>
+                            <span class="test-result success">Passou</span>
+                        </div>
+                        <div class="test-item success">
+                            <div class="test-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="test-info">
+                                <h4>expect_column_values_to_be_between</h4>
+                                <p>risk_score entre 0 e 100</p>
+                            </div>
+                            <span class="test-result success">Passou</span>
+                        </div>
+                        <div class="test-item success">
+                            <div class="test-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="test-info">
+                                <h4>expect_column_values_to_be_unique</h4>
+                                <p>transaction_id deve ser único</p>
+                            </div>
+                            <span class="test-result success">Passou</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="validation-actions">
+                    <button class="btn btn-primary" onclick="runValidation()">
+                        <i class="fas fa-play"></i>
+                        Executar Validação
+                    </button>
+                    <button class="btn btn-secondary" onclick="viewExpectations()">
+                        <i class="fas fa-eye"></i>
+                        Ver Expectativas
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Page -->
+        <section class="page" id="settings-page">
+            <div class="page-header">
+                <h2>Configurações</h2>
+                <p>Configurações do sistema e preferências</p>
+            </div>
+
+            <div class="settings-dashboard">
+                <div class="settings-section">
+                    <h3>Configurações Gerais</h3>
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label>Atualização Automática</label>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="autoRefresh" checked>
+                                <span class="slider"></span>
+                            </div>
+                            <span class="form-hint">Atualizar dados a cada 30 segundos</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Notificações</label>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="notifications" checked>
+                                <span class="slider"></span>
+                            </div>
+                            <span class="form-hint">Receber alertas de risco</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Tema</label>
+                            <select id="themeSelect">
+                                <option value="light">Claro</option>
+                                <option value="dark">Escuro</option>
+                                <option value="auto">Automático</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Configurações de Serviços</h3>
+                    <div class="service-settings">
+                        <div class="service-setting">
+                            <div class="service-info">
+                                <h4>Airflow</h4>
+                                <p>URL da API</p>
+                            </div>
+                            <input type="text" value="http://localhost:8080" class="form-control">
+                        </div>
+                        <div class="service-setting">
+                            <div class="service-info">
+                                <h4>Spark</h4>
+                                <p>URL do Master</p>
+                            </div>
+                            <input type="text" value="spark://localhost:7077" class="form-control">
+                        </div>
+                        <div class="service-setting">
+                            <div class="service-info">
+                                <h4>PostgreSQL</h4>
+                                <p>String de Conexão</p>
+                            </div>
+                            <input type="text" value="postgresql://airflow:airflow@localhost:5432/airflow" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-actions">
+                    <button class="btn btn-primary" onclick="saveSettings()">
+                        <i class="fas fa-save"></i>
+                        Salvar Configurações
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetSettings()">
+                        <i class="fas fa-undo"></i>
+                        Restaurar Padrões
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Database Connection Modal -->
+    <div class="modal" id="databaseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Conectar ao PostgreSQL</h3>
+                <button class="modal-close" onclick="closeDatabaseModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Host</label>
+                    <input type="text" id="dbHost" value="localhost" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Porta</label>
+                    <input type="text" id="dbPort" value="5432" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Database</label>
+                    <input type="text" id="dbName" value="airflow" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Usuário</label>
+                    <input type="text" id="dbUser" value="airflow" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="dbPassword" value="airflow" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDatabaseModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="connectToDatabase()">
+                    <i class="fas fa-plug"></i>
+                    Conectar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="toast-message">
+            <h4>Sucesso</h4>
+            <p>Operação realizada com sucesso!</p>
+        </div>
+        <button class="toast-close" onclick="hideToast()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
