@@ -72,7 +72,9 @@ class TestIngestComplianceData:
 
         for record in sample_compliance_data:
             for field in required_fields:
-                assert field in record, f"Campo obrigatório não encontrado: {field}"
+                assert field in record, (
+                    f"Campo obrigatório não encontrado: {field}"
+                )
 
     def test_validate_schema_with_missing_fields(self):
         """Testa validação de schema com campos faltando"""
